@@ -1,3 +1,6 @@
-django==2.2
+django==2.1.8
 djangorestframework==3.9.4
 uwsgi
+pymysql==0.9.3
+django-rest-auth==0.9.5
+six==1.12.0
