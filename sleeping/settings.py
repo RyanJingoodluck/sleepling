@@ -134,3 +134,7 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
+
+
+# 引用Django自带的User表，继承使用时需要设置
+AUTH_USER_MODEL = 'user.User'
