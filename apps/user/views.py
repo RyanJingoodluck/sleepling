@@ -2,12 +2,13 @@ import json
 
 import requests
 from django.conf import settings
+from django.http import QueryDict
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import AllowAny
 from rest_framework.decorators import list_route, detail_route
-from rest_auth.app_settings import create_token, LoginSerializer
+from rest_auth.app_settings import create_token, LoginSerializer, TokenSerializer
 from rest_auth.models import TokenModel
 
 from .models import User
@@ -38,20 +39,33 @@ class UserViewSet(ModelViewSet):
 
         # 判断用户是否第一次登录
         user = User.objects.filter(openid=openid).first()
+        is_stored = True
         if not user:
+            is_stored = False
             # 微信用户第一次登陆,新建用户
             # username = request.data.get('nickname')
             # sex = request.data.get('sex')
             # avatar = request.data.get('avatar')
-            user = User.objects.create(openid=openid,username=openid)
+            user = User.objects.create(openid=openid, username=openid)
             # user.set_password(openid)
 
         serializer_class = LoginSerializer
         token_model = TokenModel
         token = create_token(token_model, user,
                              serializer_class)
-        resp_data = {
-            "token": token,
-        }
 
-        return Response(resp_data)
+        serializer = TokenSerializer(instance=token, context={'request': request})
+        resp = serializer.data
+        resp.update({'is_stored': is_stored})
+        return Response(resp, status=status.HTTP_200_OK)
+
+    def update(self, request, *args, **kwargs):
+
+        request.data['username'] = request.data.get('nickName')
+        request.data['sex'] = request.data.get('gender')
+        request.data['city'] = request.data.get('city')
+        request.data['province'] = request.data.get('province')
+        request.data['country'] = request.data.get('country')
+        request.data['avatar'] = request.data.get('avatarURL')
+
+        return super(UserViewSet, self).update(request, *args, **kwargs)
