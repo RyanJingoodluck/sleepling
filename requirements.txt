@@ -1,5 +1,5 @@
 django==2.1.8
-djangorestframework==3.9.4
+djangorestframework==3.11.2
 uwsgi
 pymysql==0.9.3
 django-rest-auth==0.9.5
